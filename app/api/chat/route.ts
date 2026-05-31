@@ -4,7 +4,6 @@ export async function POST(req: NextRequest) {
   try {
     const { messages } = await req.json()
 
-    // Фильтруем только сообщения пользователя и ассистента, убираем первое приветствие
     const filtered = messages.filter((m: {role: string, content: string}) => 
       !(m.role === 'assistant' && messages.indexOf(m) === 0)
     )
@@ -14,13 +13,12 @@ export async function POST(req: NextRequest) {
       parts: [{ text: m.content }],
     }))
 
-    // Если нет сообщений после фильтрации — значит только приветствие, ничего не отправляем
     if (geminiMessages.length === 0) {
       return NextResponse.json({ content: 'Задайте ваш вопрос.' })
     }
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
