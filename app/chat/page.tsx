@@ -14,14 +14,21 @@ export default function ChatPage() {
     setInput('')
     setLoading(true)
 
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: [...messages, userMsg] }),
-    })
-    const data = await res.json()
-    setMessages(prev => [...prev, { role: 'assistant', content: data.reply }])
-    setLoading(false)
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [...messages, userMsg] }),
+      })
+      const data = await res.json()
+      
+      // Здесь была ошибка: меняем data.reply на data.content
+      setMessages(prev => [...prev, { role: 'assistant', content: data.content || 'Ошибка при получении ответа' }])
+    } catch (error) {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Произошла ошибка при соединении с сервером.' }])
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
